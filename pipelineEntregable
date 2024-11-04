@@ -1,0 +1,95 @@
+pipeline {
+    agent any
+
+    environment {
+        // Puedes definir aquí variables de entorno para credenciales de la nube, rutas de archivos, etc.
+        DEPLOY_ENV = "production"  // O "staging" según el entorno deseado
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Obtiene el código fuente de tu repositorio
+                git 'https://github.com/anaclaragelabert/entregable1final.git'
+                git 'https://github.com/ffporras/Entregable2-Concurrencia.git'
+                git 'https://github.com/ffporras/entregable3_DSL.git'
+            }
+        }
+
+        stage('Build Game Module') {
+            steps {
+                dir('game_module') {
+                    sh 'pip install -r requirements.txt'  // Instala dependencias del juego
+                    sh 'python setup.py install'          // Compila o configura el módulo del juego
+                }
+            }
+        }
+
+        stage('Build Order Processing Module') {
+            steps {
+                dir('order_processing') {
+                    sh 'mvn clean install'                // Construye el módulo de procesamiento de pedidos en Java
+                }
+            }
+        }
+
+        stage('Build USQL Translator Module') {
+            steps {
+                dir('usql_translator') {
+                    sh 'pip install -r requirements.txt'  // Instala dependencias del traductor
+                    sh 'python setup.py install'          // Compila o configura el módulo del traductor
+                }
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                dir('game_module') {
+                    sh 'pytest --junitxml=test-reports/results.xml --cov=src --cov-report=xml'
+                }
+                dir('order_processing') {
+                    sh 'mvn test'
+                }
+                dir('usql_translator') {
+                    sh 'pytest --junitxml=test-reports/results.xml --cov=src --cov-report=xml'
+                }
+            }
+        }
+
+        stage('Publish Results') {
+            steps {
+                publishJUnit testResults: 'game_module/test-reports/results.xml'
+                publishCoverage adapters: [coberturaAdapter('game_module/coverage.xml')]
+            }
+
+        stage('Package') {
+            steps {
+                // Paquete y versión de la aplicación (puedes crear imágenes Docker o JARs)
+                sh 'docker-compose build'  // Si estás usando Docker para el despliegue
+            }
+        }
+
+        stage('Deploy to Cloud') {
+            steps {
+                // Aquí agrega el comando para desplegar en tu servicio en la nube
+                // Ejemplo: gcloud, aws-cli, o comando para servicio específico
+                sh 'gcloud app deploy'  // Comando de despliegue (ejemplo con Google Cloud)
+            }
+        }
+    }
+
+    post {
+        success {
+            // Notificación por correo en caso de éxito
+            mail to: 'tucorreo@ejemplo.com',
+                 subject: "Éxito: Pipeline completado en ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: "El pipeline ha completado exitosamente en Jenkins. Revisa los resultados aquí: ${env.BUILD_URL}"
+        }
+        failure {
+            // Notificación por correo en caso de falla
+            mail to: 'tucorreo@ejemplo.com',
+                 subject: "Falla: Pipeline en ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: "Hubo un fallo en el pipeline. Revisa los detalles aquí: ${env.BUILD_URL}"
+        }
+    }
+}
