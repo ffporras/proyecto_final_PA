@@ -13,6 +13,7 @@ pipeline {
                 sh 'rm -rf entregable1final'
             }
         }
+    }
 
     stages {
         stage('Checkout') {
@@ -20,6 +21,7 @@ pipeline {
                 sh "git clone https://github.com/anaclaragelabert/entregable1final.git" //sh es para avisar que uso un comando bash
             }
         }
+    }
 
         stage('Build Game Module') {
             steps {
@@ -38,4 +40,3 @@ pipeline {
             }
         }
     }
-}
