@@ -24,7 +24,7 @@ pipeline {
         stage('Build Game Module') {
             steps {
                 dir('entregable1final') { //Es lo mismo que hacer cd
-                    sh "python3 src/trivia/main.py"     
+                    sh "python3 src/trivia/main.py --jenkins"     
                 }
             }
         }
