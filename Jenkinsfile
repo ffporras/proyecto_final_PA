@@ -32,7 +32,9 @@ pipeline {
          stage('Unit Tests') {
             steps {
                 dir('entregable1final') {
-                    sh 'pytest tests/'  
+                    sh 'python3 src/tests/testdecorators.py'  
+                    sh 'python3 src/tests/testmonads.py'
+                    sh 'python3 src/tests/testreader.py'
                 }
 
             }
