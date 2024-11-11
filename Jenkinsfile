@@ -11,7 +11,6 @@ pipeline {
             steps {
                 // Elimina directorios locales de repositorios si existen
                 sh 'rm -rf entregable1final'
-                sh 'rm -rf Entregable2-Concurrencia'
                 sh 'rm -rf Entregable2-Pedidos'
 
             }
@@ -45,7 +44,7 @@ pipeline {
         }
         stage('Build Concurrency Module') {
             steps {
-                dir('Entregable2-Concurrencia') {
+                dir('Entregable2-Pedidos') {
                     // Ejecuta Maven para compilar el proyecto
                     sh 'mvn clean install'
                 }
