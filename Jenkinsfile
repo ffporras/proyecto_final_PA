@@ -7,6 +7,14 @@ pipeline {
     }
 
     stages {
+        stage('Clean Workspace') {
+            steps {
+                // Elimina directorios locales de repositorios si existen
+                sh 'rm -rf entregable1final'
+            }
+        }
+
+    stages {
         stage('Checkout') {
             steps {
                 sh "git clone https://github.com/anaclaragelabert/entregable1final.git" //sh es para avisar que uso un comando bash
