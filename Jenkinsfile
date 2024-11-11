@@ -11,6 +11,7 @@ pipeline {
             steps {
                 // Elimina directorios locales de repositorios si existen
                 sh 'rm -rf entregable1final'
+                sh 'rm -rf Entregable2-Concurrencia'
                 sh 'rm -rf Entregable2-Pedidos'
 
             }
