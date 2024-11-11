@@ -11,7 +11,7 @@ pipeline {
             steps {
                 // Elimina directorios locales de repositorios si existen
                 sh 'rm -rf entregable1final'
-                sh 'rm -rf Entregable2-Concurrencia'
+                sh 'rm -rf Entregable2-Pedidos'
 
             }
         }
@@ -20,7 +20,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 sh "git clone https://github.com/anaclaragelabert/entregable1final.git" //sh es para avisar que uso un comando bash
-                sh "git clone https://github.com/ffporras/Entregable2-Concurrencia.git"
+                sh "git clone https://github.com/ffporras/Entregable2-Pedidos.git"
             }
         }
 
@@ -32,7 +32,7 @@ pipeline {
             }
         }
 
-        stage('Unit Tests') {
+        stage('Unit Tests for Entregable 1') {
             steps {
                 dir('entregable1final') {
                     sh 'python3 src/tests/testsdecorators.py'  
@@ -45,16 +45,17 @@ pipeline {
         stage('Build Concurrency Module') {
             steps {
                 dir('Entregable2-Concurrencia') {
-                    // Aquí ejecutamos la construcción o el procesamiento para el entregable 2
-                    sh 'javac -cp src src/ejemplo/*.java' // Ajusta según tus necesidades para compilar el entregable 2
+                    // Ejecuta Maven para compilar el proyecto
+                    sh 'mvn clean install'
                 }
             }
         }
 
         stage('Unit Tests for Entregable 2') {
             steps {
-                dir('Entregable2-Concurrencia') {
-                
+                dir('Entregable2-Pedidos') {
+                // Ejecuta las pruebas unitarias con Maven
+                    sh 'mvn test'
                 }
             }
         }
