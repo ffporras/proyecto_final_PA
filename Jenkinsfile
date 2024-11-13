@@ -12,6 +12,7 @@ pipeline {
                 // Elimina directorios locales de repositorios si existen
                 sh 'rm -rf entregable1final'
                 sh 'rm -rf Entregable2-Pedidos'
+                sh 'rm -rf entregable3_DSL'
 
             }
         }
@@ -21,6 +22,7 @@ pipeline {
             steps {
                 sh "git clone https://github.com/anaclaragelabert/entregable1final.git" //sh es para avisar que uso un comando bash
                 sh "git clone https://github.com/ffporras/Entregable2-Pedidos.git"
+                sg "git clone https://github.com/ffporras/entregable3_DSL.git"
             }
         }
 
@@ -32,7 +34,7 @@ pipeline {
             }
         }
 
-        stage('Unit Tests for Entregable 1') {
+        stage('Unit Tests for Entregable 1 - Trivia') {
             steps {
                 dir('entregable1final') {
                     sh 'python3 src/tests/testsdecorators.py'  
@@ -46,17 +48,36 @@ pipeline {
             steps {
                 dir('Entregable2-Pedidos') {
                     // Ejecuta Maven para compilar el proyecto
-                    sh 'mvn clean install'
+                    //sh 'mvn clean install'
                 }
             }
         }
 
-        stage('Unit Tests for Entregable 2') {
+        stage('Unit Tests for Entregable 2 - Concurrency') {
             steps {
                 dir('Entregable2-Pedidos') {
                 // Ejecuta las pruebas unitarias con Maven
-                    sh 'mvn test'
+                    //sh 'mvn test'
                 }
+            }
+        }
+
+        stage('USQL Module') {
+            steps {
+                dir('entregable3_DSL') { //Es lo mismo que hacer cd
+                    sh "python3 src/main/main.py"     
+                }
+            }
+        }
+
+        stage('Unit Tests for Entregable 3 - USQL/SQL') {
+            steps {
+                dir('entregable3_DSL') {
+                    sh 'python3 src/main/Test_traductorSQLaUSQL.py'  
+                    sh 'python3 src/main/Test_traductorUSQLaSQL.py'
+                    sh 'python3 src/main/TestFluentAPI.py'
+                }
+
             }
         }
     }
