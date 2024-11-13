@@ -98,31 +98,31 @@ pipeline {
                     sh 'python3 src/main/Test_traductorUSQLaSQL.py'
                     sh 'python3 src/main/TestFluentAPI.py'
                 }
-
             }
         }
+    }
 
-        post {
-            always {
-                emailext (
-                    to: 'florenciaporras03@gmail.com',
-                    subject: "Pipeline Result: ${currentBuild.fullDisplayName}",
-                    body: """
-                    Resultado del pipeline: ${currentBuild.result}
-                    Detalles: ${env.BUILD_URL}
-                    """
-                )
-            }
-            failure {
-                emailext (
-                    to: 'florenciaporras03@gmail.com',
-                    subject: "Pipeline FAILED: ${currentBuild.fullDisplayName}",
-                    body: """
-                    Resultado del pipeline: ${currentBuild.result}
-                    Detalles: ${env.BUILD_URL}
-                    """
-                )
-            }
+    post {
+        always {
+            emailext (
+                to: 'florenciaporras03@gmail.com',
+                subject: "Pipeline Result: ${currentBuild.fullDisplayName}",
+                body: """
+                Resultado del pipeline: ${currentBuild.result}
+                Detalles: ${env.BUILD_URL}
+                """
+            )
         }
-    }   
+        failure {
+            emailext (
+                to: 'florenciaporras03@gmail.com',
+                subject: "Pipeline FAILED: ${currentBuild.fullDisplayName}",
+                body: """
+                Resultado del pipeline: ${currentBuild.result}
+                Detalles: ${env.BUILD_URL}
+                """
+            )
+        }
+    }
+      
 }
