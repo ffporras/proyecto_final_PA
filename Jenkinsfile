@@ -38,7 +38,7 @@ pipeline {
             steps {
                 dir('entregable1final') { //Es lo mismo que hacer cd
                     sh "python3 src/trivia/main.py --jenkins"   
-                    sh "python3 -m pydoc -w Trivia"  
+                    sh "python3 -m pydoc -w src/trivia"  
                 }
             }
         }
@@ -49,6 +49,7 @@ pipeline {
                     sh 'python3 src/tests/testsdecorators.py'  
                     sh 'python3 src/tests/testsmonads.py'
                     sh 'python3 src/tests/testsreader.py'
+                    sh "python3 -m pydoc -w src/tests"
                 }
 
             }
@@ -56,7 +57,7 @@ pipeline {
         stage('Build Concurrency Module') {
             steps {
                 dir('Entregable2-Pedidos') {
-                    sh "javadoc -d javadoc src/*.java"
+                    sh "javadoc -d javadoc src/main/java/*.java"
                     sh "javac src/main/Main.java"
                     sh "java Main"
                     // Ejecuta Maven para compilar el proyecto
