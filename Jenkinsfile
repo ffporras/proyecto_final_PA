@@ -13,7 +13,7 @@ pipeline {
                 sh 'rm -rf entregable1final'
                 sh 'rm -rf Entregable2-Pedidos'
                 sh 'rm -rf entregable3_DSL'
-
+                cleanWs()
             }
         }
 
@@ -61,6 +61,12 @@ pipeline {
         //        }
         //    }
         //}
+
+        stage('Install dependencies for Entregable 3 - USQL/SQL') {
+            steps {
+                sh 'pip install ply'
+            }
+        }
 
         stage('USQL Module') {
             steps {
