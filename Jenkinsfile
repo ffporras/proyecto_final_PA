@@ -37,7 +37,8 @@ pipeline {
         stage('Build Game Module') {
             steps {
                 dir('entregable1final') { //Es lo mismo que hacer cd
-                    sh "python3 src/trivia/main.py --jenkins"     
+                    sh "python3 src/trivia/main.py --jenkins"   
+                    sh "python3 -m pydoc -w Trivia"  
                 }
             }
         }
@@ -52,14 +53,17 @@ pipeline {
 
             }
         }
-        //stage('Build Concurrency Module') {
-        //    steps {
-        //        dir('Entregable2-Pedidos') {
-        //            // Ejecuta Maven para compilar el proyecto
-        //            //sh 'mvn clean install'
-        //        }
-        //    }
-        //}
+        stage('Build Concurrency Module') {
+            steps {
+                dir('Entregable2-Pedidos') {
+                    javadoc -d javadoc Codigo\ Principal/src/*.java
+                    javac src/main/Main.java
+                    java Main
+                    // Ejecuta Maven para compilar el proyecto
+                    //sh 'mvn clean install'
+                }
+            }
+        }
 
         //stage('Unit Tests for Entregable 2 - Concurrency') {
         //    steps {
@@ -81,7 +85,8 @@ pipeline {
         stage('USQL Module') {
             steps {
                 dir('entregable3_DSL') { //Es lo mismo que hacer cd
-                    sh "python3 src/main/main.py"     
+                    sh "python3 src/main/main.py" 
+                    sh "python3 -m pydoc -w Pedidos"     
                 }
             }
         }
@@ -96,5 +101,28 @@ pipeline {
 
             }
         }
-    }
+
+        post {
+            always {
+                emailext (
+                    to: 'florenciaporras03@gmail.com',
+                    subject: "Pipeline Result: ${currentBuild.fullDisplayName}",
+                    body: """
+                    Resultado del pipeline: ${currentBuild.result}
+                    Detalles: ${env.BUILD_URL}
+                    """
+                )
+            }
+            failure {
+                emailext (
+                    to: 'florenciaporras03@gmail.com',
+                    subject: "Pipeline FAILED: ${currentBuild.fullDisplayName}",
+                    body: """
+                    Resultado del pipeline: ${currentBuild.result}
+                    Detalles: ${env.BUILD_URL}
+                    """
+                )
+            }
+        }
+    }   
 }
