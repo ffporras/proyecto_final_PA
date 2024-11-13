@@ -54,26 +54,13 @@ pipeline {
 
             }
         }
+        
         stage('Build Concurrency Module') {
             steps {
-                dir('Entregable2-Pedidos') {
-                    //sh "javadoc -d javadoc src/main/java/*.java"
-                    sh "javac src/main/java/*.java"
-                    sh "java -cp src/main/java main.java.Main"
-                    // Ejecuta Maven para compilar el proyecto
-                    //sh 'mvn clean install'
-                }
+                // Llama al job "Build Concurrency Module"
+                build job: 'Build Concurrency Module'
             }
         }
-
-        //stage('Unit Tests for Entregable 2 - Concurrency') {
-        //    steps {
-        //        dir('Entregable2-Pedidos') {
-                // Ejecuta las pruebas unitarias con Maven
-                    //sh 'mvn test'
-        //        }
-        //    }
-        //}
 
         stage('Install dependencies for Entregable 3 - USQL/SQL') {
             steps {
