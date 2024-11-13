@@ -38,7 +38,7 @@ pipeline {
             steps {
                 dir('entregable1final') { //Es lo mismo que hacer cd
                     sh "python3 src/trivia/main.py --jenkins"   
-                    sh "python3 -m pydoc -w src.trivia"  
+                    //sh "python3 -m pydoc -w src.trivia"  
                 }
             }
         }
