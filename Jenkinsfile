@@ -38,7 +38,7 @@ pipeline {
             steps {
                 dir('entregable1final') { //Es lo mismo que hacer cd
                     sh "python3 src/trivia/main.py --jenkins"   
-                    sh "python3 -m pydoc -w src/trivia"  
+                    sh "python3 -m pydoc -w src.trivia"  
                 }
             }
         }
@@ -49,7 +49,7 @@ pipeline {
                     sh 'python3 src/tests/testsdecorators.py'  
                     sh 'python3 src/tests/testsmonads.py'
                     sh 'python3 src/tests/testsreader.py'
-                    sh "python3 -m pydoc -w src/tests"
+                    //sh "python3 -m pydoc -w src/tests"
                 }
 
             }
@@ -86,8 +86,7 @@ pipeline {
         stage('USQL Module') {
             steps {
                 dir('entregable3_DSL') { //Es lo mismo que hacer cd
-                    sh "python3 src/main/main.py" 
-                    sh "python3 -m pydoc -w Pedidos"     
+                    sh "python3 src/main/main.py"     
                 }
             }
         }
