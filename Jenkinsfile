@@ -56,9 +56,9 @@ pipeline {
         stage('Build Concurrency Module') {
             steps {
                 dir('Entregable2-Pedidos') {
-                    javadoc -d javadoc Codigo\ Principal/src/*.java
-                    javac src/main/Main.java
-                    java Main
+                    sh "javadoc -d javadoc Codigo\ Principal/src/*.java"
+                    sh "javac src/main/Main.java"
+                    sh "java Main"
                     // Ejecuta Maven para compilar el proyecto
                     //sh 'mvn clean install'
                 }
