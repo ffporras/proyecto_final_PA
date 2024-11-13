@@ -21,7 +21,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 sh "git clone https://github.com/anaclaragelabert/entregable1final.git" //sh es para avisar que uso un comando bash
-                sh "git clone https://github.com/ffporras/Entregable2-Pedidos.git"
+                //sh "git clone https://github.com/ffporras/Entregable2-Pedidos.git"
                 sg "git clone https://github.com/ffporras/entregable3_DSL.git"
             }
         }
@@ -44,23 +44,23 @@ pipeline {
 
             }
         }
-        stage('Build Concurrency Module') {
-            steps {
-                dir('Entregable2-Pedidos') {
-                    // Ejecuta Maven para compilar el proyecto
-                    //sh 'mvn clean install'
-                }
-            }
-        }
+        //stage('Build Concurrency Module') {
+        //    steps {
+        //        dir('Entregable2-Pedidos') {
+        //            // Ejecuta Maven para compilar el proyecto
+        //            //sh 'mvn clean install'
+        //        }
+        //    }
+        //}
 
-        stage('Unit Tests for Entregable 2 - Concurrency') {
-            steps {
-                dir('Entregable2-Pedidos') {
+        //stage('Unit Tests for Entregable 2 - Concurrency') {
+        //    steps {
+        //        dir('Entregable2-Pedidos') {
                 // Ejecuta las pruebas unitarias con Maven
                     //sh 'mvn test'
-                }
-            }
-        }
+        //        }
+        //    }
+        //}
 
         stage('USQL Module') {
             steps {
