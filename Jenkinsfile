@@ -29,7 +29,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 sh "git clone https://github.com/anaclaragelabert/entregable1final.git" //sh es para avisar que uso un comando bash
-                //sh "git clone https://github.com/ffporras/Entregable2-Pedidos.git"
+                sh "git clone https://github.com/ffporras/Entregable2-Pedidos.git"
                 sh "git clone https://github.com/ffporras/entregable3_DSL.git"
             }
         }
