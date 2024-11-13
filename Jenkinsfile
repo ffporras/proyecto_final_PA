@@ -17,6 +17,14 @@ pipeline {
             }
         }
 
+        stage('Check Python and Pip') {
+            steps {
+                sh 'which python3 || echo "Python not found"'
+                sh 'python3 --version || echo "Python version check failed"'
+                sh 'python3 -m pip --version || echo "Pip not found"'
+            }
+        }
+
     
         stage('Checkout') {
             steps {
@@ -64,7 +72,7 @@ pipeline {
 
         stage('Install dependencies for Entregable 3 - USQL/SQL') {
             steps {
-                sh 'pip install ply'
+                sh 'python3 -m pip install ply'
             }
         }
 
