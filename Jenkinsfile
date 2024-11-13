@@ -73,6 +73,7 @@ pipeline {
         stage('Install dependencies for Entregable 3 - USQL/SQL') {
             steps {
                 sh 'python3 -m pip install ply'
+                sh 'python3 -m pip install sqlparse'
             }
         }
 
