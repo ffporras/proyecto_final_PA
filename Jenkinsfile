@@ -83,7 +83,7 @@ pipeline {
                 dir('entregable3_DSL') {
                     sh 'python3 src/main/Test_traductorSQLaUSQL.py'  
                     sh 'python3 src/main/Test_traductorUSQLaSQL.py'
-                    //sh 'python3 src/main/TestFluentAPI.py'
+                    sh 'python3 src/main/TestFluentAPI.py'
                 }
             }
         }
