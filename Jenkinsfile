@@ -74,6 +74,7 @@ pipeline {
             steps {
                 sh 'python3 -m pip install ply'
                 sh 'python3 -m pip install sqlparse'
+                sh 'python3 -m pip install coverage'
             }
         }
 
