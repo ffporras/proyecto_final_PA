@@ -58,8 +58,8 @@ pipeline {
             steps {
                 dir('Entregable2-Pedidos') {
                     //sh "javadoc -d javadoc src/main/java/*.java"
-                    sh "javac src/main/java/Main.java"
-                    sh "java src/main/java/Main"
+                    sh "javac src/main/java/*.java"
+                    sh "java -cp src/main/java main.java.Main"
                     // Ejecuta Maven para compilar el proyecto
                     //sh 'mvn clean install'
                 }
