@@ -54,7 +54,7 @@ pipeline {
 
             }
         }
-        
+
         stage('Build Concurrency Module') {
             steps {
                 // Llama al job "Build Concurrency Module"
@@ -88,5 +88,27 @@ pipeline {
             }
         }
     }
-      
+
+    post {
+        always {
+            emailext (
+                to: 'florenciaporras03@gmail.com',
+                subject: "Pipeline Result: ${currentBuild.fullDisplayName}",
+                body: """
+                Resultado del pipeline: ${currentBuild.result}
+                Detalles: ${env.BUILD_URL}
+                """
+            )
+        }
+        failure {
+            emailext (
+                to: 'florenciaporras03@gmail.com',
+                subject: "Pipeline FAILED: ${currentBuild.fullDisplayName}",
+                body: """
+                Resultado del pipeline: ${currentBuild.result}
+                Detalles: ${env.BUILD_URL}
+                """
+            )
+        }
+    }
 }
