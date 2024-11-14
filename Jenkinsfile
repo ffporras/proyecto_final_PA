@@ -14,7 +14,7 @@ pipeline {
         )
         choice(
             name: 'TEST_MODULE',
-            choices: ['Entregable 1 - Trivia', 'Entregable 3 - USQL/SQL', 'Handled Internally'],
+            choices: ['Entregable 1 - Trivia', 'Entregable 3 - USQL/SQL', 'Otro'],
             description: 'Selecciona el módulo para el cual deseas ejecutar pruebas unitarias en esta ejecución del pipeline. Elige "Handled Internally" si las pruebas ya se ejecutan en el módulo de concurrencia.'
         )
     }
@@ -105,7 +105,7 @@ pipeline {
 
         stage('Unit Tests for Selected Module') {
             when {
-                expression { params.TEST_MODULE != 'Handled Internally' }
+                expression { params.TEST_MODULE != 'Otro' }
             }
             steps {
                 script {
