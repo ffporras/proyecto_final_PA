@@ -9,7 +9,7 @@ pipeline {
         )
         choice(
             name: 'BUILD_MODULE',
-            choices: ['Game Module', 'Concurrency Module', 'USQL Module'],
+            choices: ['Jugar Trivia', 'Encargar Pedido', 'Traducir USQL'],
             description: 'Selecciona el módulo que deseas construir en esta ejecución del pipeline.'
         )
         choice(
@@ -51,7 +51,7 @@ pipeline {
 
         stage('Build Selected Module') {
             when {
-                expression { params.BUILD_MODULE == 'Game Module' }
+                expression { params.BUILD_MODULE == 'Jugar Trivia' }
             }
             steps {
                 dir('entregable1final') { //dir es como cd en la terminal
@@ -62,15 +62,19 @@ pipeline {
 
         stage('Build Concurrency Module') {
             when {
-                expression { params.BUILD_MODULE == 'Concurrency Module' }
+                expression { params.BUILD_MODULE == 'Encargar Pedido' }
             }
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     build job: 'Build Concurrency Module', propagate: false
                 }
                 // Copiamos los artefactos del job secundario para que los logs se puedan mostrar aquí
-                copyArtifacts(projectName: 'Build Concurrency Module', filter: '**/*.log', target: 'logs/')
-                // Muestra el contenido de los logs copiados en el pipeline principal
+                copyArtifacts(
+                projectName: 'Build Concurrency Module',
+                selector: lastSuccessful(),
+                filter: '**/*.log',
+                target: 'logs'
+                )
                 script {
                     def logFiles = findFiles(glob: 'logs/**/*.log')
                     logFiles.each { logFile ->
@@ -83,7 +87,7 @@ pipeline {
 
         stage('Build USQL Module') {
             when {
-                expression { params.BUILD_MODULE == 'USQL Module' }
+                expression { params.BUILD_MODULE == 'Traducir USQL' }
             }
             steps {
                 dir('entregable3_DSL') {
@@ -94,7 +98,7 @@ pipeline {
 
         stage('Install dependencies for Entregable 3 - USQL/SQL') {
             when {
-                expression { params.BUILD_MODULE == 'USQL Module' || params.TEST_MODULE == 'Entregable 3 - USQL/SQL' }
+                expression { params.BUILD_MODULE == 'Traducir USQL' || params.TEST_MODULE == 'Entregable 3 - USQL/SQL' }
             }
             steps {
                 sh 'python3 -m pip install ply'
