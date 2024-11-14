@@ -62,3 +62,35 @@ El pipeline incluye un bloque `post` que envía correos electrónicos con los re
 
 El pipeline asume que los módulos mencionados están disponibles en los repositorios de GitHub y que los scripts necesarios para su ejecución están ubicados en las rutas correspondientes dentro de los repositorios.
 
+Además para que funcionen las notificaciones por correo, se necesita tener configurado Jenkins.
+  En Dashboard > Manage Jenkins > System
+  Se tiene que configurar  Extended E-mail Notification:
+
+    - SMTP server: smtp.gmail.com
+    - SMTP Port: 465
+  
+  En advanced:
+    Credentials: se tiene que tener creada una credencial con el nombre del mail y seleccionar Use SSL
+
+  Y se tiene que configurar E-mail Notification:
+  
+    - SMTP server: smtp.gmail.com
+
+  En advancd: 
+    - Seleccionar Use SMTP Authentication
+    - User Name: en este caso esta configurado para florenciaporras03@gmail.com (pero debes de poner el tuyo)
+    - Password: se tiene que usar la App password configurada en el mail de User Name
+    - SMTP Port: 465
+    - Reply-To Address: mismo mail que User Name
+
+  Y luego se clickea Apply
+  
+
+
+
+
+
+
+
+
+
