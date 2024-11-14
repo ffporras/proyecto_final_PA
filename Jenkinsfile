@@ -68,13 +68,14 @@ pipeline {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     build job: 'Build Concurrency Module', propagate: false
                 }
-                // Copiamos los artefactos del job secundario para que los logs se puedan mostrar aquí
+                // Copiar los artefactos del job secundario para que los logs se puedan mostrar aquí
                 copyArtifacts(
-                projectName: 'Build Concurrency Module',
-                selector: lastSuccessful(),
-                filter: '**/*.log',
-                target: 'logs'
+                    projectName: 'Build Concurrency Module',
+                    selector: lastSuccessful(),
+                    filter: '**/*.log',
+                    target: 'logs'
                 )
+                // Mostrar el contenido de los logs
                 script {
                     def logFiles = findFiles(glob: 'logs/**/*.log')
                     logFiles.each { logFile ->
@@ -82,6 +83,8 @@ pipeline {
                         echo readFile(logFile.path)
                     }
                 }
+                // Publicar los resultados de las pruebas de Maven
+                junit '**/target/surefire-reports/*.xml' // Asegúrate de que la ruta del reporte sea correcta
             }
         }
 
