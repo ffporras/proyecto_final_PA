@@ -9,13 +9,13 @@ pipeline {
         )
         choice(
             name: 'BUILD_MODULE',
-            choices: ['Jugar al trivia', 'Encargar pedido', 'Traducir USQL'],
+            choices: ['Game Module', 'Concurrency Module', 'USQL Module'],
             description: 'Selecciona el módulo que deseas construir en esta ejecución del pipeline.'
         )
         choice(
             name: 'TEST_MODULE',
-            choices: ['Entregable 1 - Trivia', 'Entregable 3 - USQL/SQL'],
-            description: 'Selecciona el módulo para el cual deseas ejecutar pruebas unitarias en esta ejecución del pipeline.'
+            choices: ['Entregable 1 - Trivia', 'Entregable 3 - USQL/SQL', 'Handled Internally'],
+            description: 'Selecciona el módulo para el cual deseas ejecutar pruebas unitarias en esta ejecución del pipeline. Elige "Handled Internally" si las pruebas ya se ejecutan en el módulo de concurrencia.'
         )
     }
 
@@ -26,8 +26,7 @@ pipeline {
     stages {
         stage('Clean Workspace') {
             steps {
-                // Elimina directorios locales de repositorios si existen
-                sh 'rm -rf entregable1final'
+                sh 'rm -rf entregable1final' //sh es como ejecutar un comando en la terminal
                 sh 'rm -rf Entregable2-Pedidos'
                 sh 'rm -rf entregable3_DSL'
                 cleanWs()
@@ -50,13 +49,12 @@ pipeline {
             }
         }
 
-        stage('Build Trivia Module') {
+        stage('Build Selected Module') {
             when {
-                expression { params.BUILD_MODULE == 'Jugar al trivia' }
+                expression { params.BUILD_MODULE == 'Game Module' }
             }
             steps {
-                dir('entregable1final') {
-                    echo "Ejecutando Trivia..."
+                dir('entregable1final') { //dir es como cd en la terminal
                     sh "python3 src/trivia/main.py --jenkins"
                 }
             }
@@ -64,21 +62,31 @@ pipeline {
 
         stage('Build Concurrency Module') {
             when {
-                expression { params.BUILD_MODULE == 'Encargar pedido' }
+                expression { params.BUILD_MODULE == 'Concurrency Module' }
             }
             steps {
-                echo "Ejecutando Pedidos..."
-                build job: 'Build Concurrency Module'
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    build job: 'Build Concurrency Module', propagate: false
+                }
+                // Copiamos los artefactos del job secundario para que los logs se puedan mostrar aquí
+                copyArtifacts(projectName: 'Build Concurrency Module', filter: '**/*.log', target: 'logs/')
+                // Muestra el contenido de los logs copiados en el pipeline principal
+                script {
+                    def logFiles = findFiles(glob: 'logs/**/*.log')
+                    logFiles.each { logFile ->
+                        echo "Contenido del log: ${logFile.name}"
+                        echo readFile(logFile.path)
+                    }
+                }
             }
         }
 
         stage('Build USQL Module') {
             when {
-                expression { params.BUILD_MODULE == 'Traducir USQL' }
+                expression { params.BUILD_MODULE == 'USQL Module' }
             }
             steps {
                 dir('entregable3_DSL') {
-                    echo "Ejecutando Traducción USQL a SQL..."
                     sh "python3 src/main/main.py"
                 }
             }
@@ -86,7 +94,7 @@ pipeline {
 
         stage('Install dependencies for Entregable 3 - USQL/SQL') {
             when {
-                expression { params.BUILD_MODULE == 'Traducir USQL' || params.TEST_MODULE == 'Entregable 3 - USQL/SQL' }
+                expression { params.BUILD_MODULE == 'USQL Module' || params.TEST_MODULE == 'Entregable 3 - USQL/SQL' }
             }
             steps {
                 sh 'python3 -m pip install ply'
@@ -95,30 +103,25 @@ pipeline {
             }
         }
 
-        stage('Unit Tests for Trivia Module') {
+        stage('Unit Tests for Selected Module') {
             when {
-                expression { params.TEST_MODULE == 'Entregable 1 - Trivia' }
+                expression { params.TEST_MODULE != 'Handled Internally' }
             }
             steps {
-                dir('entregable1final') {
-                    echo "Ejecutando Pruebas de trivia..."
-                    sh 'python3 src/tests/testsdecorators.py'
-                    sh 'python3 src/tests/testsmonads.py'
-                    sh 'python3 src/tests/testsreader.py'
-                }
-            }
-        }
-
-        stage('Unit Tests for USQL/SQL Module') {
-            when {
-                expression { params.TEST_MODULE == 'Entregable 3 - USQL/SQL' }
-            }
-            steps {
-                dir('entregable3_DSL') {
-                    echo "Ejecutando Pruebas de traducción..."
-                    sh 'python3 src/main/Test_traductorSQLaUSQL.py'
-                    sh 'python3 src/main/Test_traductorUSQLaSQL.py'
-                    sh 'python3 src/main/TestFluentAPI.py'
+                script {
+                    if (params.TEST_MODULE == 'Entregable 1 - Trivia') {
+                        dir('entregable1final') {
+                            sh 'python3 src/tests/testsdecorators.py'
+                            sh 'python3 src/tests/testsmonads.py'
+                            sh 'python3 src/tests/testsreader.py'
+                        }
+                    } else if (params.TEST_MODULE == 'Entregable 3 - USQL/SQL') {
+                        dir('entregable3_DSL') {
+                            sh 'python3 src/main/Test_traductorSQLaUSQL.py'
+                            sh 'python3 src/main/Test_traductorUSQLaSQL.py'
+                            sh 'python3 src/main/TestFluentAPI.py'
+                        }
+                    }
                 }
             }
         }
