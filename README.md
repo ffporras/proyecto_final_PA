@@ -62,6 +62,7 @@ El pipeline incluye un bloque `post` que envía correos electrónicos con los re
 
 El pipeline asume que los módulos mencionados están disponibles en los repositorios de GitHub y que los scripts necesarios para su ejecución están ubicados en las rutas correspondientes dentro de los repositorios.
 
+#### Para poder ejecutar las notificaciones
 Además para que funcionen las notificaciones por correo, se necesita tener configurado Jenkins.
   En Dashboard > Manage Jenkins > System
   Se tiene que configurar  Extended E-mail Notification:
@@ -85,12 +86,7 @@ Además para que funcionen las notificaciones por correo, se necesita tener conf
 
   Y luego se clickea Apply
   
+#### Para poder ejecutar el modulo de concurrencia
+Se debe crear un freestyle project llamado "Build Concurrency Module" en donde se pone git como Source Code Managment, se copia el repositorio que esta en la pipeline y se cambia a main el branch specifier
 
-
-
-
-
-
-
-
-
+En build Steps se debe colocar un step que sea maven y en goals poner clean package
