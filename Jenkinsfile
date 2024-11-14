@@ -61,6 +61,9 @@ pipeline {
         }
 
         stage('Build Concurrency Module') {
+            when {
+                expression { params.BUILD_MODULE == 'Encargar Pedido' }
+            }
             steps {
                 // Llama al job "Build Concurrency Module"
                 build job: 'Build Concurrency Module'
