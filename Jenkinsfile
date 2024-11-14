@@ -1,9 +1,26 @@
 pipeline {
     agent any
 
+    parameters {
+        choice(
+            name: 'DEPLOY_ENVIRONMENT',
+            choices: ['production', 'staging', 'development', 'testing'],
+            description: 'Selecciona el entorno de despliegue. Esto determinará las variables y configuraciones aplicadas durante el proceso.'
+        )
+        choice(
+            name: 'BUILD_MODULE',
+            choices: ['Jugar al trivia', 'Encargar pedido', 'Traducir USQL'],
+            description: 'Selecciona el módulo que deseas construir en esta ejecución del pipeline.'
+        )
+        choice(
+            name: 'TEST_MODULE',
+            choices: ['Entregable 1 - Trivia', 'Entregable 3 - USQL/SQL'],
+            description: 'Selecciona el módulo para el cual deseas ejecutar pruebas unitarias en esta ejecución del pipeline.'
+        )
+    }
+
     environment {
-        //Variables de entorno para credenciales de la nube, rutas de archivos, etc.
-        DEPLOY_ENV = "production" 
+        DEPLOY_ENV = "${params.DEPLOY_ENVIRONMENT}"
     }
 
     stages {
@@ -25,44 +42,52 @@ pipeline {
             }
         }
 
-    
         stage('Checkout') {
             steps {
-                sh "git clone https://github.com/anaclaragelabert/entregable1final.git" //sh es para avisar que uso un comando bash
+                sh "git clone https://github.com/anaclaragelabert/entregable1final.git"
                 sh "git clone https://github.com/ffporras/Entregable2-Pedidos.git"
                 sh "git clone https://github.com/ffporras/entregable3_DSL.git"
             }
         }
 
-        stage('Build Game Module') {
-            steps {
-                dir('entregable1final') { //Es lo mismo que hacer cd
-                    sh "python3 src/trivia/main.py --jenkins"   
-                    //sh "python3 -m pydoc -w src.trivia"  
-                }
+        stage('Build Trivia Module') {
+            when {
+                expression { params.BUILD_MODULE == 'Jugar al trivia' }
             }
-        }
-
-        stage('Unit Tests for Entregable 1 - Trivia') {
             steps {
                 dir('entregable1final') {
-                    sh 'python3 src/tests/testsdecorators.py'  
-                    sh 'python3 src/tests/testsmonads.py'
-                    sh 'python3 src/tests/testsreader.py'
-                    //sh "python3 -m pydoc -w src/tests"
+                    echo "Ejecutando Trivia..."
+                    sh "python3 src/trivia/main.py --jenkins"
                 }
-
             }
         }
 
         stage('Build Concurrency Module') {
+            when {
+                expression { params.BUILD_MODULE == 'Encargar pedido' }
+            }
             steps {
-                // Llama al job "Build Concurrency Module"
+                echo "Ejecutando Pedidos..."
                 build job: 'Build Concurrency Module'
             }
         }
 
+        stage('Build USQL Module') {
+            when {
+                expression { params.BUILD_MODULE == 'Traducir USQL' }
+            }
+            steps {
+                dir('entregable3_DSL') {
+                    echo "Ejecutando Traducción USQL a SQL..."
+                    sh "python3 src/main/main.py"
+                }
+            }
+        }
+
         stage('Install dependencies for Entregable 3 - USQL/SQL') {
+            when {
+                expression { params.BUILD_MODULE == 'Traducir USQL' || params.TEST_MODULE == 'Entregable 3 - USQL/SQL' }
+            }
             steps {
                 sh 'python3 -m pip install ply'
                 sh 'python3 -m pip install sqlparse'
@@ -70,18 +95,28 @@ pipeline {
             }
         }
 
-        stage('USQL Module') {
+        stage('Unit Tests for Trivia Module') {
+            when {
+                expression { params.TEST_MODULE == 'Entregable 1 - Trivia' }
+            }
             steps {
-                dir('entregable3_DSL') { //Es lo mismo que hacer cd
-                    sh "python3 src/main/main.py"     
+                dir('entregable1final') {
+                    echo "Ejecutando Pruebas de trivia..."
+                    sh 'python3 src/tests/testsdecorators.py'
+                    sh 'python3 src/tests/testsmonads.py'
+                    sh 'python3 src/tests/testsreader.py'
                 }
             }
         }
 
-        stage('Unit Tests for Entregable 3 - USQL/SQL') {
+        stage('Unit Tests for USQL/SQL Module') {
+            when {
+                expression { params.TEST_MODULE == 'Entregable 3 - USQL/SQL' }
+            }
             steps {
                 dir('entregable3_DSL') {
-                    sh 'python3 src/main/Test_traductorSQLaUSQL.py'  
+                    echo "Ejecutando Pruebas de traducción..."
+                    sh 'python3 src/main/Test_traductorSQLaUSQL.py'
                     sh 'python3 src/main/Test_traductorUSQLaSQL.py'
                     sh 'python3 src/main/TestFluentAPI.py'
                 }
