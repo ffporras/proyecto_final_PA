@@ -61,44 +61,9 @@ pipeline {
         }
 
         stage('Build Concurrency Module') {
-            when {
-                expression { params.BUILD_MODULE == 'Encargar Pedido' }
-            }
             steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    build job: 'Build Concurrency Module', propagate: false
-                }
-                // Copiar los artefactos del job secundario para que los logs se puedan mostrar aquí
-                copyArtifacts(
-                    projectName: 'Build Concurrency Module',
-                    selector: lastSuccessful(),
-                    filter: '**/*.log',
-                    target: 'logs'
-                )
-                
-                // Mostrar el contenido de los logs
-                script {
-                    def logFiles = findFiles(glob: 'logs/**/*.log')
-                    logFiles.each { logFile ->
-                        echo "Contenido del log: ${logFile.name}"
-                        echo readFile(logFile.path)
-                    }
-                }
-                
-                // Imprimir el contenido del archivo JAR
-                script {
-                    def jarPath = 'target/entregable2-Pedidos-1.0-SNAPSHOT.jar'
-                    if (fileExists(jarPath)) {
-                        echo "Contenido del JAR: ${jarPath}"
-                        // Listar los archivos dentro del .jar
-                        sh "jar tf ${jarPath}"
-                    } else {
-                        echo "El archivo JAR no se ha encontrado en la ruta: ${jarPath}"
-                    }
-                }
-                
-                // Publicar los resultados de las pruebas de Maven
-                junit '**/target/surefire-reports/*.xml' // Asegúrate de que la ruta del reporte sea correcta
+                // Llama al job "Build Concurrency Module"
+                build job: 'Build Concurrency Module'
             }
         }
 
